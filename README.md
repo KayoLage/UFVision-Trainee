@@ -82,6 +82,6 @@ Desde já, agradeço à **Equipe UFVision** pela oportunidade de participar do p
 
 ## 👨‍💻 Autor
 
-Projeto desenvolvido por **Kayo de Melo Lage**
+Projeto desenvolvido por **Kayo de M. Lage**
 
 Equipe UFVision — Universidade Federal de Viçosa (UFV)
