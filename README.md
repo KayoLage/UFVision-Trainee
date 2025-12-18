@@ -73,7 +73,7 @@ python3 main.py
 ### 📚 Guia de Instalação do ArduPilot e Gazebo
 
 Caso você ainda não tenha o ArduPilot e o Gazebo instalados, consulte o guia abaixo:
-[Guia empírico - ArduPilot e SITL via MAVProxy no Gazebo Harmonic](Guia empírico - ArduPilot e SITL via MAVProxy no Gazebo Harmonic.pdf)
+[Guia empírico - ArduPilot e SITL via MAVProxy no Gazebo Harmonic](Guia%20emp%C3%ADrico%20-%20ArduPilot%20e%20SITL%20via%20MAVProxy%20no%20Gazebo%20Harmonic.pdf)
 
 ## Observações Finais
 
