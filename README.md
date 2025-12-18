@@ -66,7 +66,7 @@ cd ~/UFVision-Trainee/ardupilot
 
 ```
 conda activate ardupilot_gazebo 
-cd ~/UFVision-Traine
+cd ~/UFVision-Trainee
 python3 main.py
 ```
 
