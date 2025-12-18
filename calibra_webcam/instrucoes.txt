@@ -1,0 +1,9 @@
+O objetivo desse folder aqui é justamente fazer alguns scripts para calibração
+da câmera no sentido de encontrar um bom intervalo de valor para cada cor de 
+acordo com cada WebCam, assim podemos "facilmente" estender isso para diferentes
+setups de dispositivos...
+
+--- SUGESTÕES ---
+
+Para cores como vermelho, amarelo e laranja recomendo usar HSV (ao menos foi testado este para elas e conseguiu separar bem)
+Para preto e marrom especificamente o melhor que encontrei foi o LAB (Para essas o HSV e o YUV teve dificuldade de separar, o LAB foi a que se adaptou melhor)
