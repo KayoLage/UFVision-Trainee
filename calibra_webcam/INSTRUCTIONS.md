@@ -33,12 +33,12 @@ Para o preto **(ative o MODO_PRETO = True)** é esperado uma separação razoáv
 
 ![Exemplo de máscara para o Preto](../images/mascara_preto.png)
 
-*Figura: Exemplo da máscara do preto
+*Figura: Exemplo da máscara do preto*
 
 Para o marrom o mesmo **(ative o MODO_MARROM = True)**
 
 
 ![Exemplo de máscara para o Marrom](../images/mascara_marrom.png)
 
-*Figura: Exemplo da máscara do marrom
+*Figura: Exemplo da máscara do marrom*
 
