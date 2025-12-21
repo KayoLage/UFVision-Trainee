@@ -76,7 +76,7 @@ python3 main.py
 
 Se você conseguiu executar tudo corretamente ótimo, você está pronto para os próximos passos!
 
-Sugiro que siga agora o guia de calibração [INSTRUCTIONS.md]() calibre a câmera de acordo com seu ambiente de captura e objetos de fundo.
+Sugiro que siga agora o guia de calibração [INSTRUCTIONS.md](calibra_webcam/INSTRUCTIONS.md) calibre a câmera de acordo com seu ambiente de captura e objetos de fundo.
 
 ### 📚 Guia de Instalação do ArduPilot e Gazebo
 
