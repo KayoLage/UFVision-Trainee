@@ -21,8 +21,24 @@ A seguir segue algumas imagens do que é esperado para as máscaras, se você co
 
 ## Validação da Máscara do Laranja
 
-Para o **Laranja**, é esperado que a máscara bruta seja "gulosa", capturando também pixels de Amarelo, Vermelho e Azul. O sistema foi desenhado para realizar a limpeza automática via subtração booleana no script principal.
+Para o **Laranja**, é esperado que a máscara bruta seja "gulosa" (ative o MODO_LARANJA = True), capturando também pixels de Amarelo, Vermelho e Azul. O sistema foi desenhado para realizar a limpeza automática via subtração booleana no script principal.
 
 ![Exemplo de máscara bruta para o Laranja](../images/mosaicos/mosaico_laranja_github.png)
 
 *Figura: Exemplo da máscara bruta capturando (a) Amarelo, (b) Vermelho, (c) Azul e (d) Laranja antes da subtração lógica.*
+
+## Validação Máscara Preto e Marrom
+
+Para o preto **(ative o MODO_PRETO = True)** é esperado uma separação razoável, mas não perfeita do objeto de interesse, provavelmente em ambientes de captura com ruído pode ser que capture bastante outros objetos, você deve **ajustar o threshold de pixels** bem como colocar **EhPraFazerAbertura = False do Marrom**
+
+![Exemplo de máscara para o Preto](../images/mascara_preto.png)
+
+*Figura: Exemplo da máscara do preto
+
+Para o marrom o mesmo **(ative o MODO_MARROM = True)**
+
+
+![Exemplo de máscara para o Marrom](../images/mascara_marrom.png)
+
+*Figura: Exemplo da máscara do marrom
+
