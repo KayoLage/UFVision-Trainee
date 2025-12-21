@@ -17,7 +17,7 @@ Sobre os espaços de cor:
 
 A seguir segue algumas imagens do que é esperado para as máscaras, se você conseguiu encontrar limiares que sejam próximos ou até melhores que isso você já consegue rodar o código de modo que ele seja robusto o suficiente para diferenciar todas as 6 cores!
 
-> IMPORTANTE!!! => Para o laranja procure uma máscara que bruta que ela cubra o laranja, amarelo, vermelho e azul (não se preocupe que o código subtrai o amarelo e o vermelho depois deixando apenas o laranja)
+> IMPORTANTE!!! => Para o laranja procure uma máscara que bruta ela cubra o laranja, amarelo, vermelho e azul (não se preocupe que o código faz um pós-procesamento da máscara que subtrai as interferências do amarelo, vermelho e azul, deixando apenas o laranja)
 
 ## Validação da Máscara do Laranja
 
@@ -35,7 +35,7 @@ Para o preto **(ative o MODO_PRETO = True)** é esperado uma separação razoáv
 
 *Figura: Exemplo da máscara do preto*
 
-Para o marrom o mesmo **(ative o MODO_MARROM = True)**
+Para o marrom é análogo **(ative o MODO_MARROM = True)**
 
 
 ![Exemplo de máscara para o Marrom](../images/mascara_marrom.png)
