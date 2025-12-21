@@ -80,120 +80,21 @@ def telemetry_reader(master):
 # FUNÇÕES DE VOO
 # ---------------------------------------------------
 def arm_and_takeoff(master, altitude):
-    print("--- INICIANDO SEQUÊNCIA DE DECOLAGEM SEGURA ---")
-    
-    # 1. Desativa Checks (Segurança para simulação)
-    master.mav.param_set_send(
-        master.target_system, master.target_component,
-        b'ARMING_CHECK', 0, mavutil.mavlink.MAV_PARAM_TYPE_INT32)
-    print("Parâmetro ARMING_CHECK ajustado para 0.")
-
-    # 2. ESPERA PELO GPS (Bloqueante com timeout)
-    print("Aguardando Fixação do GPS (Isso pode levar até 1 minuto)...")
-    gps_timeout = time.time() + 60  # 60 segundos de timeout
-    
-    while True:
-        if time.time() > gps_timeout:
-            print("⚠️ AVISO: Timeout do GPS. Continuando mesmo assim (modo simulação).")
-            break
-            
-        msg = master.recv_match(type='GPS_RAW_INT', blocking=False, timeout=0.5)
-        if msg:
-            if msg.fix_type >= 3:
-                print(f"GPS Fixado! (Satélites: {msg.satellites_visible})")
-                break
-            elif msg.fix_type < 3:
-                if int(time.time()) % 2 == 0:
-                    print(f"Aguardando Satélites... Fix Type: {msg.fix_type} (Necessário >= 3)")
-                time.sleep(0.5)
-
-    # 3. Garante Modo GUIDED
-    print("Tentando entrar em modo GUIDED...")
-    guided_timeout = time.time() + 10
-    
-    while master.flightmode != 'GUIDED':
-        if time.time() > guided_timeout:
-            print("⚠️ AVISO: Timeout para entrar em GUIDED. Tentando continuar...")
-            break
-        master.set_mode('GUIDED')
-        time.sleep(1)
-        print(f"Modo atual: {master.flightmode}. Aguardando GUIDED...")
-    
-    # 4. Arma os Motores
-    print("Armando motores...")
-    master.mav.command_long_send(
-        master.target_system,
-        master.target_component,
-        mavutil.mavlink.MAV_CMD_COMPONENT_ARM_DISARM,
-        0, 1, 0, 0, 0, 0, 0, 0
-    )
-    
-    # Espera ativa pela confirmação com timeout
-    arm_timeout = time.time() + 10
-    while not master.motors_armed():
-        if time.time() > arm_timeout:
-            print("⚠️ AVISO: Timeout ao armar. Verificando status...")
-            break
-        time.sleep(0.1)
-    
-    if master.motors_armed():
-        print("!!! MOTORES ARMADOS !!!")
-    else:
-        print("⚠️ AVISO: Motores podem não estar armados corretamente!")
-    
-    time.sleep(2)  # Estabiliza hélices
-
-    # 5. Decolagem
-    print(f"Decolando para {altitude}m...")
-    master.mav.command_long_send(
-        master.target_system,
-        master.target_component,
-        mavutil.mavlink.MAV_CMD_NAV_TAKEOFF,
-        0, 0, 0, 0, 0, 0, 0, altitude
-    )
-
-    # 6. Monitora subida COM TIMEOUT
-    print("Monitorando altitude...")
-    takeoff_timeout = time.time() + 30  # 30 segundos para decolar
-    last_alt_print = 0
-    
-    while True:
-        # Verifica timeout
-        if time.time() > takeoff_timeout:
-            print(f"⚠️ AVISO: Timeout de decolagem atingido. Continuando...")
-            break
-        
-        # Tenta receber mensagem com timeout curto
-        msg = master.recv_match(type='GLOBAL_POSITION_INT', blocking=False, timeout=0.5)
-        
-        if msg:
-            alt_atual = msg.relative_alt / 1000.0
-            
-            # Print a cada 0.5m para não poluir
-            if abs(alt_atual - last_alt_print) >= 0.5:
-                print(f"Altitude: {alt_atual:.1f}m / {altitude}m")
-                last_alt_print = alt_atual
-            
-            if alt_atual >= altitude * 0.85:
-                print(f"✅ Altitude alvo alcançada! ({alt_atual:.1f}m)")
-                break
-        else:
-            # Se não receber mensagem, tenta LOCAL_POSITION_NED
-            msg_local = master.recv_match(type='LOCAL_POSITION_NED', blocking=False, timeout=0.5)
-            if msg_local:
-                alt_atual = -msg_local.z  # Z é negativo no NED
-                
-                if abs(alt_atual - last_alt_print) >= 0.5:
-                    print(f"Altitude (local): {alt_atual:.1f}m / {altitude}m")
-                    last_alt_print = alt_atual
-                
-                if alt_atual >= altitude * 0.95:
-                    print(f"✅ Altitude alvo alcançada! ({alt_atual:.1f}m)")
-                    break
-        
-        time.sleep(0.1)  # Pequeno delay para não saturar CPU
-    
-    print("Decolagem concluída!")
+	master.set_mode('GUIDED')
+	master.mav.command_long_send(
+		master.target_system, master.target_component,
+		mavutil.mavlink.MAV_CMD_COMPONENT_ARM_DISARM,
+		0, 1, 0,0,0,0,0,0
+	)
+	time.sleep(1)
+	master.mav.command_long_send(
+		master.target_system, master.target_component,
+		mavutil.mavlink.MAV_CMD_NAV_TAKEOFF,
+		0,0,0,0,0,0,0, altitude
+	)
+	print(f"Decolando para {altitude}m...")
+	time.sleep(altitude * 2)
+	print("Decolagem concluída.")
 
 def move_increments(master, dx, dy, dz):
     # aguarda posição inicial
@@ -278,6 +179,11 @@ def condition_yaw(master, heading, relative=False):
         is_relative = 0 # 0 = Absoluto (Global)
         direction = 0   # 0 = Shortest Path (O drone escolhe o lado mais curto para girar)
 
+    # Para yaw absoluto, o heading deve estar entre 0 e 360.
+    # Se vier negativo (ex: -90), normalizamos para 270.
+    if heading < 0:
+        heading += 360
+        
     # MAV_CMD_CONDITION_YAW
     master.mav.command_long_send(
         master.target_system,

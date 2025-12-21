@@ -1,9 +1,14 @@
 name: ardupilot_gazebo
 channels:
+<<<<<<< HEAD
+=======
+  - conda-forge
+>>>>>>> ca31b87 (Colocando remoção de pequenos CC's e adicionando blur no módulo de visão, simplificando arm and takeoff func, simplificando calibragem da câmera)
   - defaults
 dependencies:
   - _libgcc_mutex=0.1=main
   - _openmp_mutex=5.1=1_gnu
+<<<<<<< HEAD
   - bzip2=1.0.8=h5eee18b_6
   - ca-certificates=2025.11.4=h06a4308_0
   - expat=2.7.3=h3385a95_0
@@ -20,13 +25,84 @@ dependencies:
   - libzlib=1.3.1=hb25bd0a_0
   - ncurses=6.5=h7934f7d_0
   - openssl=3.0.18=hd6dcaed_0
+=======
+  - aom=3.9.1=hac33072_0
+  - blosc=1.21.6=hef167b5_0
+  - brunsli=0.1=he3183e4_1
+  - bzip2=1.0.8=h5eee18b_6
+  - c-blosc2=2.15.2=h68e2383_0
+  - ca-certificates=2025.11.12=hbd8a1cb_0
+  - charls=2.4.2=h59595ed_0
+  - dav1d=1.2.1=hd590300_0
+  - expat=2.7.3=h3385a95_0
+  - giflib=5.2.2=hd590300_0
+  - imagecodecs=2024.9.22=py310hdbe5077_0
+  - imageio=2.37.0=pyhfb79c49_0
+  - importlib-metadata=8.7.0=pyhe01879c_1
+  - jxrlib=1.1=hd590300_3
+  - lazy-loader=0.4=pyhd8ed1ab_2
+  - lcms2=2.17=h717163a_0
+  - ld_impl_linux-64=2.44=h153f514_2
+  - lerc=4.0.0=h0aef613_1
+  - libaec=1.1.4=h3f801dc_0
+  - libavif16=1.3.0=h6395336_2
+  - libblas=3.11.0=5_h4a7cf45_openblas
+  - libbrotlicommon=1.1.0=hb03c661_4
+  - libbrotlidec=1.1.0=hb03c661_4
+  - libbrotlienc=1.1.0=hb03c661_4
+  - libcblas=3.11.0=5_h0358290_openblas
+  - libdeflate=1.22=hb9d3cd8_0
+  - libffi=3.4.4=h6a678d5_1
+  - libfreetype=2.14.1=ha770c72_0
+  - libfreetype6=2.14.1=h73754d4_0
+  - libgcc=15.2.0=h69a1729_7
+  - libgcc-ng=15.2.0=h166f726_7
+  - libgfortran=15.2.0=h69a702a_16
+  - libgfortran5=15.2.0=h68bc16d_16
+  - libgomp=15.2.0=h4751f2c_7
+  - libhwy=1.3.0=h4c17acf_1
+  - libjpeg-turbo=3.1.2=hb03c661_0
+  - libjxl=0.11.1=h6cb5226_4
+  - liblapack=3.11.0=5_h47877c9_openblas
+  - libnsl=2.0.0=h5eee18b_0
+  - libopenblas=0.3.30=pthreads_h94d23a6_4
+  - libpng=1.6.53=h421ea60_0
+  - libstdcxx=15.2.0=h39759b7_7
+  - libstdcxx-ng=15.2.0=hc03a8fd_7
+  - libtiff=4.7.0=he137b08_1
+  - libuuid=1.41.5=h5eee18b_0
+  - libwebp-base=1.6.0=hd42ef1d_0
+  - libxcb=1.17.0=h9b100fa_0
+  - libzlib=1.3.1=hb25bd0a_0
+  - libzopfli=1.0.3=h9c3ff4c_0
+  - lz4-c=1.9.4=hcb278e6_0
+  - ncurses=6.5=h7934f7d_0
+  - networkx=3.4.2=pyh267e887_2
+  - openjpeg=2.5.3=h55fea9a_1
+  - openssl=3.6.0=h26f9b46_0
+  - packaging=25.0=pyh29332c3_1
+>>>>>>> ca31b87 (Colocando remoção de pequenos CC's e adicionando blur no módulo de visão, simplificando arm and takeoff func, simplificando calibragem da câmera)
   - pexpect=4.9.0=py310h06a4308_1
   - pthread-stubs=0.3=h0ce48e5_1
   - ptyprocess=0.7.0=pyhd3eb1b0_3
   - python=3.10.19=h6fa692b_0
+<<<<<<< HEAD
   - readline=8.3=hc2a1206_0
   - setuptools=80.9.0=py310h06a4308_0
   - sqlite=3.51.0=h2a70700_0
+=======
+  - python_abi=3.10=2_cp310
+  - pywavelets=1.8.0=py310hf462985_0
+  - rav1e=0.7.1=h8fae777_3
+  - readline=8.3=hc2a1206_0
+  - scikit-image=0.25.2=py310h0158d43_2
+  - scipy=1.15.2=py310h1d65ade_0
+  - setuptools=80.9.0=py310h06a4308_0
+  - snappy=1.2.2=h03e3b7b_1
+  - sqlite=3.51.0=h2a70700_0
+  - svt-av1=3.1.2=hecca717_0
+  - tifffile=2024.12.12=pyhd8ed1ab_0
+>>>>>>> ca31b87 (Colocando remoção de pequenos CC's e adicionando blur no módulo de visão, simplificando arm and takeoff func, simplificando calibragem da câmera)
   - tk=8.6.15=h54e0aa7_0
   - tzdata=2025b=h04d1e81_0
   - wheel=0.45.1=py310h06a4308_0
@@ -35,7 +111,15 @@ dependencies:
   - xorg-libxdmcp=1.1.5=h9b100fa_0
   - xorg-xorgproto=2024.1=h5eee18b_1
   - xz=5.6.4=h5eee18b_1
+<<<<<<< HEAD
   - zlib=1.3.1=hb25bd0a_0
+=======
+  - zfp=1.0.1=h909a3a2_3
+  - zipp=3.23.0=pyhcf101f3_1
+  - zlib=1.3.1=hb25bd0a_0
+  - zlib-ng=2.2.5=hde8ca8f_1
+  - zstd=1.5.7=hb78ec9c_6
+>>>>>>> ca31b87 (Colocando remoção de pequenos CC's e adicionando blur no módulo de visão, simplificando arm and takeoff func, simplificando calibragem da câmera)
   - pip:
       - contourpy==1.3.2
       - cycler==0.12.1
@@ -48,7 +132,10 @@ dependencies:
       - mavproxy==1.8.71
       - numpy==2.2.5
       - opencv-python==4.11.0.86
+<<<<<<< HEAD
       - packaging==25.0
+=======
+>>>>>>> ca31b87 (Colocando remoção de pequenos CC's e adicionando blur no módulo de visão, simplificando arm and takeoff func, simplificando calibragem da câmera)
       - pillow==11.2.1
       - pip==25.3
       - pymavlink==2.4.43

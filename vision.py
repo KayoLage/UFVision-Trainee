@@ -2,70 +2,99 @@ import cv2
 import numpy as np
 import os
 import sys
+import time 
+from skimage.measure import label, regionprops
+import settings as s
 
 # adiciona automaticamente a pasta pai ao PYTHONPATH
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # --- CONFIGURAÇÕES GLOBAIS --- #
-KERNEL = cv2.getStructuringElement(cv2.MORPH_RECT, (5, 5)) 
+MORPHOLOGY_KERNEL = s.MORPHOLOGY_KERNEL
+BLUR_KERNEL = s.BLUR_KERNEL
 
 # Thresholds específicos por cor
-THRESHOLD_PIXELS = 15000     # Azul, Vermelho, Amarelo
-THRESHOLD_ORANGE = 40000     # Laranja
-THRESHOLD_BLACK  = 70000     # Preto
-THRESHOLD_BROWN  = 110000    # Marrom
+THRESHOLD_PIXELS = s.THRESHOLD_PIXELS   # Azul, Vermelho, Amarelo
+THRESHOLD_ORANGE = s.THRESHOLD_ORANGE   # Laranja
+THRESHOLD_BLACK  = s.THRESHOLD_BLACK    # Preto
+THRESHOLD_BROWN  = s.THRESHOLD_BROWN    # Marrom
 
 # Define o tamanho mínimo de um "blob" para ser considerado objeto.
-AREA_MINIMA_RUIDO = 10000 
+AREA_MINIMA_RUIDO = s.AREA_MINIMA_RUIDO 
+
+# Thresholds para remoção de CC's
+THRESHOLD_AREA_MIN_REMOVE_CC = s.THRESHOLD_AREA_MIN_REMOVE_CC
+THRESHOLD_AREA_MAX_REMOVE_CC = s.THRESHOLD_AREA_MAX_REMOVE_CC
+
+# --- Ranges HSV --- #
+ranges = s.RANGES
+
 
 def abertura(mascara):
     """Remove ruídos pequenos (pontos brancos isolados)."""
-    return cv2.morphologyEx(mascara, cv2.MORPH_OPEN, KERNEL)
+    return cv2.morphologyEx(mascara, cv2.MORPH_OPEN, MORPHOLOGY_KERNEL)
 
 def fechamento(mascara):
     """Fecha buracos pretos dentro do objeto."""
-    return cv2.morphologyEx(mascara, cv2.MORPH_CLOSE, KERNEL)
+    return cv2.morphologyEx(mascara, cv2.MORPH_CLOSE, MORPHOLOGY_KERNEL)
 
-def filtrar_ruido_por_contorno(mascara, area_minima):
+def remove_componentes_por_area(
+    binary_mask,
+    min_area=None,
+    max_area=None,
+    connectivity=2
+):
     """
-    Substitui a lógica de 'Abertura' agressiva.
-    Usa componentes conexos (findContours) para remover APENAS objetos pequenos,
-    sem alterar a forma dos objetos grandes (diferente da erosão).
+    Remove componentes conexos de acordo com a área.
     """
-    contornos, _ = cv2.findContours(mascara, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    
-    # Criamos uma nova máscara limpa (preta)
-    mascara_limpa = np.zeros_like(mascara)
-    
-    for cnt in contornos:
-        area = cv2.contourArea(cnt)
-        
-        if area > area_minima:
-            cv2.drawContours(mascara_limpa, [cnt], -1, 255, thickness=cv2.FILLED)
-            
-    return mascara_limpa
+    # Garante binário 0/1
+    binary_mask = (binary_mask > 0).astype(np.uint8)
 
-def processar_mascara_completa(mascara, EhPraFazerAbertura = True):
+    labeled = label(binary_mask, connectivity=connectivity)
+    output = np.zeros_like(binary_mask)
+
+    for region in regionprops(labeled):
+        area = region.area
+
+        if min_area is not None and area < min_area:
+            continue
+        if max_area is not None and area > max_area:
+            continue
+
+        output[labeled == region.label] = 1
+
+    return output
+
+def processar_mascara_completa(mascara, EhPraFazerAbertura=True):
     """
-    Pipeline de limpeza atualizado:
-    1. Abertura (limpa poeira de 1px)
-    2. Filtro de Contorno (remove manchas pequenas/médias sem deformar o objeto)
-    3. Fechamento (tapa buracos dentro do objeto)
+    Pipeline de limpeza atualizado com remove_componentes_por_area
     """
+    # Abertura
     if EhPraFazerAbertura:
         m = abertura(mascara)
     else:
         m = mascara
     
-    m = filtrar_ruido_por_contorno(m, area_minima=AREA_MINIMA_RUIDO)
+    # Filtragem por Área
+    m = remove_componentes_por_area(
+        m, 
+        min_area=THRESHOLD_AREA_MIN_REMOVE_CC, 
+        max_area=THRESHOLD_AREA_MAX_REMOVE_CC 
+    )
+    
+    # CONVERSÃO IMPORTANTE (garantir uint8)
+    m = m * 255
+    m = m.astype(np.uint8) 
+    
+    # Fechamento
     m = fechamento(m)
+    
     return m
 
 def criar_mosaico(frame_original, mascaras_dict, comando_atual):
     """
-    Cria um mosaico das máscaras de todas as cores para debug do código
-    e fala se a máscara "foi ativada" ou não de acordo com seu threshold
+    Cria um mosaico das máscaras de todas as cores para debug
     """
     scale = 0.5
     h, w = frame_original.shape[:2]
@@ -86,7 +115,7 @@ def criar_mosaico(frame_original, mascaras_dict, comando_atual):
             
             qtd = cv2.countNonZero(mask)
             
-            # --- LÓGICA DE COR DO TEXTO (VISUALIZAÇÃO) --- #
+            # Lógica visual de Threshold
             if nome_cor == "Orange":
                 limit = THRESHOLD_ORANGE
             elif nome_cor == "Brown":
@@ -117,83 +146,71 @@ def detectar_cor_e_retornar_mascaras(frame):
     mascaras = {}
     comando_final = None
     
-    # 1. CLAHE e HSV
-    hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+    # --- PRÉ-PROCESSAMENTO (BLUR) --- #
+    frame_blurred = cv2.medianBlur(frame, BLUR_KERNEL)
+
+    # CLAHE e HSV
+    hsv = cv2.cvtColor(frame_blurred, cv2.COLOR_BGR2HSV)
+    
     h, s, v = cv2.split(hsv)
-    clahe = cv2.createCLAHE(clipLimit=3.0, tileGridSize=(8, 8))
+    clahe = cv2.createCLAHE(clipLimit=3.0, tileGridSize=(8, 8)) 
     v = clahe.apply(v)
     hsv = cv2.merge([h, s, v])
 
-    # --- DEFINIÇÃO DOS RANGES ---
-    ranges = {
-        # Cores "Fáceis"
-        "Blue":   (np.array([25, 100, 0]), np.array([140, 255, 255])),
-        "Red":    (np.array([125, 100, 40]), np.array([170, 255, 255])),
-        "Yellow": (np.array([15, 45, 105]), np.array([30, 255, 255])),
-        
-        # Cores "Difíceis"
-        "Orange": (np.array([0, 75, 140]), np.array([179, 255, 255])), 
-        "Brown":  (np.array([0, 0, 0]), np.array([179, 130, 105])), 
-        "Black":  (np.array([0, 0, 0]), np.array([179, 60, 110]))
-    }
-    
-    # --- ORDEM DE CÁLCULO DAS MÁSCARAS (DEPENDÊNCIAS) --- #
-    
-    # 1. Independentes
+    # --- CÁLCULO DAS MÁSCARAS --- #
+
+    # 1⁰) Máscaras Independentes
     for cor in ["Blue", "Red", "Yellow"]:
         low, high = ranges[cor]
         m = cv2.inRange(hsv, low, high)
         mascaras[cor] = processar_mascara_completa(m)
 
-    # 2. Black (Calculado primeiro para ser usado pelo Marrom)
+    # 2⁰) Black
     low_k, high_k = ranges["Black"]
     mask_black = cv2.inRange(hsv, low_k, high_k)
-    mascaras["Black"] = processar_mascara_completa(mask_black, EhPraFazerAbertura=False)
+    mascaras["Black"] = processar_mascara_completa(mask_black, EhPraFazerAbertura=False) # OBS.: coloque False se houver muitos objetos (sobretudo objetos menores)
+                                                                                         # background no cenário de cor MARROM (já que subtraímos do preto a máscara do marrom,
+                                                                                         # no geral False não muda muito, mude també o threshold de pixels para se detectar o preto 
+                                                                                         # (aumentar)) se o ambiente de captura for "limpo", então por via das dúvidas False
 
-    # 3. Brown (Subtrai Vermelho, Azul, Amarelo e PRETO)
+    # 3⁰) Brown
     low_b, high_b = ranges["Brown"]
     mask_brown = cv2.inRange(hsv, low_b, high_b)
     
     if "Red" in mascaras:
         mask_brown = cv2.subtract(mask_brown, mascaras["Red"])
-        
     if "Blue" in mascaras:
         mask_brown = cv2.subtract(mask_brown, mascaras["Blue"])
     if "Yellow" in mascaras:
         mask_brown = cv2.subtract(mask_brown, mascaras["Yellow"])
         
-    # Subtrai o Preto inicial do Marrom
-    if "Black" in mascaras:
-        mask_brown = cv2.subtract(mask_brown, mascaras["Black"])
-        
-    # Processa o Marrom Final
-    mascaras["Brown"] = processar_mascara_completa(mask_brown, EhPraFazerAbertura=True)
+    mascaras["Brown"] = processar_mascara_completa(mask_brown, EhPraFazerAbertura=True)  # OBS.: coloque False se houver muitos objetos (sobretudo objetos menores)
+                                                                                         # background no cenário de cor PRETA (já que subtraímos do marrom a máscara do preto,
+                                                                                         # no geral False não muda muito, mude també o threshold de pixels para se detectar o preto 
+                                                                                         # (aumentar)) se o ambiente de captura for "limpo", então por via das dúvidas False
 
-    # [NOVO] O PEDIDO: Subtrair a Máscara Marrom Final da Máscara Preta
+    # Subtrai Brown do Black
     if "Black" in mascaras:
         mascaras["Black"] = cv2.subtract(mascaras["Black"], mascaras["Brown"])
 
-    # 4. Orange (O "Guloso" - Subtrai todos os outros)
+    # 4⁰) Orange
     low_o, high_o = ranges["Orange"]
     mask_orange = cv2.inRange(hsv, low_o, high_o)
     if "Red" in mascaras:
         mask_orange = cv2.subtract(mask_orange, mascaras["Red"])
     if "Yellow" in mascaras:
         mask_orange = cv2.subtract(mask_orange, mascaras["Yellow"])
-    if "Brown" in mascaras:
-        mask_orange = cv2.subtract(mask_orange, mascaras["Brown"])
     if "Blue" in mascaras:
         mask_orange = cv2.subtract(mask_orange, mascaras["Blue"])
+
     mascaras["Orange"] = processar_mascara_completa(mask_orange)
 
-    # --- LÓGICA DE DECISÃO (PRIORIDADE) --- #
-    prioridade_verificacao = ["Blue", "Yellow", "Red", "Orange", "Black", "Brown"]
-    # Da máscara mais confiável para menos confiável
-
+    # --- LÓGICA DE DECISÃO --- #
+    prioridade_verificacao = ["Blue", "Yellow", "Red", "Orange", "Black", "Brown"] # Da cor mais confiável para menos confiável (via empírica)
+    
     for cor in prioridade_verificacao:
         qtd = cv2.countNonZero(mascaras[cor])
         
-        # Seleciona o threshold correto para a cor atual
         if cor == "Orange":
             limite = THRESHOLD_ORANGE 
         elif cor == "Brown":
@@ -210,12 +227,23 @@ def detectar_cor_e_retornar_mascaras(frame):
     return comando_final, mascaras
 
 def start_vision_loop(command_queue):
+    # --- CONFIGURAÇÃO DE SALVAMENTO --- # (Só para colocar no relatório e no GitHub -> IGNORAR)
+    HOME_DIR = os.path.expanduser("~")
+    SAVE_DIR = os.path.join(HOME_DIR, "UFVision-Trainee", "images")
+    
+    if not os.path.exists(SAVE_DIR):
+        try: os.makedirs(SAVE_DIR)
+        except OSError: pass
+
     cap = cv2.VideoCapture(0)
     if not cap.isOpened():
         print("Visão: Erro webcam.")
         return
 
     cooldown = 0 
+    
+    print("--- SISTEMA DE VISÃO INICIADO ---")
+    print(f"Pressione 's' na janela do Mosaico para salvar em: {SAVE_DIR}")
 
     while True:
         ret, frame = cap.read()
@@ -236,9 +264,37 @@ def start_vision_loop(command_queue):
         mosaico = criar_mosaico(frame, mascaras_dict, cmd_detectado)
         cv2.imshow('Mosaico de Debug (Original + Mascaras)', mosaico)
         
-        if cv2.waitKey(1) & 0xFF == ord('q'):
+        # --- CONTROLE DE TECLAS ---
+        k = cv2.waitKey(1) & 0xFF
+        
+        if k == ord('q'):
             command_queue.put("QUIT")
             break
+        
+        elif k == ord('s'):
+            # 1. Gera o timestamp para a pasta e arquivos
+            timestamp = time.strftime("%Y%m%d_%H%M%S")
+            # Criamos uma subpasta específica para este "print"
+            pasta_momento = os.path.join(SAVE_DIR, f"captura_{timestamp}")
+            
+            if not os.path.exists(pasta_momento):
+                os.makedirs(pasta_momento)
+
+            # 2. Salva o mosaico completo (opcional, mas bom para referência)
+            cv2.imwrite(os.path.join(pasta_momento, "00_mosaico_completo.png"), mosaico)
+            
+            # 3. Salva o frame original (sem as máscaras em cima)
+            cv2.imwrite(os.path.join(pasta_momento, "01_frame_original.png"), frame)
+
+            # 4. Percorre o dicionário e salva cada máscara individualmente
+            for nome_cor, mascara in mascaras_dict.items():
+                nome_arquivo = f"mask_{nome_cor}_{timestamp}.png"
+                caminho_final = os.path.join(pasta_momento, nome_arquivo)
+                
+                # Salvando a máscara
+                cv2.imwrite(caminho_final, mascara)
+            
+            print(f"[VISION] Captura completa salva em: {pasta_momento}")
             
     cap.release()
     cv2.destroyAllWindows()
