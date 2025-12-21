@@ -42,3 +42,4 @@ Para o marrom o mesmo **(ative o MODO_MARROM = True)**
 
 *Figura: Exemplo da máscara do marrom*
 
+Quanto ao resultado final deve ser o mesmo que o mostrado no capítulo de resultados do [Relatório](../report.pdf)
