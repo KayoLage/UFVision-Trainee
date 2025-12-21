@@ -19,6 +19,10 @@ A seguir segue algumas imagens do que é esperado para as máscaras, se você co
 
 > IMPORTANTE!!! => Para o laranja procure uma máscara que bruta que ela cubra o laranja, amarelo, vermelho e azul (não se preocupe que o código subtrai o amarelo e o vermelho depois deixando apenas o laranja)
 
+## Validação da Máscara do Laranja
 
+Para o **Laranja**, é esperado que a máscara bruta seja "gulosa", capturando também pixels de Amarelo, Vermelho e Azul. O sistema foi desenhado para realizar a limpeza automática via subtração booleana no script principal.
 
-Exemplo da máscara do laranja pegando todos as 4 cores ((a) Amarelo, (b) Vermelho, (c) Azul, (d) Vermelho) em `calibra.py`
+![Exemplo de máscara bruta para o Laranja](../images/mosaicos/mosaico_laranja_github.png)
+
+*Figura: Exemplo da máscara bruta capturando (a) Amarelo, (b) Vermelho, (c) Azul e (d) Laranja antes da subtração lógica.*
