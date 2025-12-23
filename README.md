@@ -17,7 +17,7 @@ Este repositório reúne implementações que cobrem:
 - 🧠 Processamento de imagens para melhoria de máscaras:
   - Filtro de blur
   - Operações morfológicas
-  - Remoçao de CC's
+  - Remoção de CC's
 - 🚁 Controle de drone em simulação utilizando:
   - Gazebo Simulator
   - ArduPilot
