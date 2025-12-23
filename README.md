@@ -15,8 +15,9 @@ Este repositório reúne implementações que cobrem:
   - YUV
   - LAB
 - 🧠 Processamento de imagens para melhoria de máscaras:
-  - Filtros de blur
+  - Filtro de blur
   - Operações morfológicas
+  - Remoçao de CC's
 - 🚁 Controle de drone em simulação utilizando:
   - Gazebo Simulator
   - ArduPilot
