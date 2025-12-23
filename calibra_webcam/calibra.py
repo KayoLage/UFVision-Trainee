@@ -16,8 +16,8 @@ def nothing(x):
 
 # --- CONFIGURAÇÕES DE MODO (Escolha um para True) ---
 MODO_PRETO   = False  # Subtrai Marrom
-MODO_LARANJA = True  # Subtrai Red, Yellow, Brown e Blue
-MODO_MARROM  = False   # Subtrai Red, Blue e Yellow [NOVO]
+MODO_LARANJA = False  # Subtrai Red, Yellow, Brown e Blue
+MODO_MARROM  = True   # Subtrai Red, Blue e Yellow [NOVO]
 
 HOME_DIR = os.path.expanduser("~")
 SAVE_DIR = os.path.join(HOME_DIR, "UFVision-Trainee", "images")

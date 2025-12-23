@@ -13,12 +13,36 @@ Sobre os espaços de cor:
 * Para cores como **vermelho**, **amarelo** e **laranja** recomendo usar **HSV** (ao menos foi testado este para elas e conseguiu separar bem)
 * Para **preto e marrom pode ser** que o **LAB seja melhor** (mas o **HSV** costuma ser melhor também, inclusive recomendo ele)
 
+---
+
 ## O que é esperado?
 
 A seguir segue algumas imagens do que é esperado para as máscaras, se você conseguiu encontrar limiares que sejam próximos ou até melhores que isso você já consegue rodar o código de modo que ele seja robusto o suficiente para diferenciar todas as 6 cores!
 
-> IMPORTANTE!!! => Para o laranja procure uma máscara que bruta que ela cubra o laranja, amarelo, vermelho e azul (não se preocupe que o código subtrai o amarelo e o vermelho depois deixando apenas o laranja)
+> IMPORTANTE!!! => Para o laranja procure uma máscara que bruta ela cubra o laranja, amarelo, vermelho e azul (não se preocupe que o código faz um pós-procesamento da máscara que subtrai as interferências do amarelo, vermelho e azul, deixando apenas o laranja)
+
+## Validação da Máscara do Laranja
+
+Para o **Laranja**, é esperado que a máscara bruta seja "gulosa" (ative o MODO_LARANJA = True), capturando também pixels de Amarelo, Vermelho e Azul. O sistema foi desenhado para realizar a limpeza automática via subtração booleana no script principal.
+
+![Exemplo de máscara bruta para o Laranja](../assets/mosaicos/mosaico_laranja_github.png)
+
+*Figura: Exemplo da máscara bruta capturando (a) Amarelo, (b) Vermelho, (c) Azul e (d) Laranja antes da subtração lógica.*
+
+## Validação Máscara Preto e Marrom
+
+Para o preto **(ative o MODO_PRETO = True)** é esperado uma separação razoável, mas não perfeita do objeto de interesse, provavelmente em ambientes de captura com ruído pode ser que capture bastante outros objetos, você deve **ajustar o threshold de pixels** bem como colocar **EhPraFazerAbertura = False do Marrom**
+
+![Exemplo de máscara para o Preto](../assets/mascara_preto.png)
+
+*Figura: Exemplo da máscara do preto*
+
+Para o marrom é análogo **(ative o MODO_MARROM = True)**
 
 
+![Exemplo de máscara para o Marrom](../assets/mascara_marrom.png)
 
-Exemplo da máscara do laranja pegando todos as 4 cores ((a) Amarelo, (b) Vermelho, (c) Azul, (d) Vermelho) em `calibra.py`
+*Figura: Exemplo da máscara do marrom*
+
+Quanto ao resultado final deve ser o mesmo que o mostrado no capítulo de resultados do [Relatório](../report.pdf)
+

@@ -38,9 +38,19 @@ Antes de executar o projeto, certifique-se de ter instalado:
 
 ---
 
-## 📦 Instalação do Ambiente Python
+## Clonando Repositório
 
-Clone o repositório e crie o ambiente Conda a partir do arquivo `environment.yml`:
+Clone o repositório
+
+```
+git clone -b kayo --single-branch https://github.com/ufvision/Trainee-2025.git # clona uma única branch
+cd Trainee-2025
+git submodule update --init --recursive
+```
+
+# 📦 Instalação do Ambiente Python
+
+Crie o ambiente Conda a partir do arquivo `environment.yml`:
 
 ```
 conda env create -f environment.yml
@@ -72,11 +82,11 @@ cd ~/UFVision-Trainee
 python3 main.py
 ```
 
-### Próximos passos
+### ➡️ Próximos passos
 
 Se você conseguiu executar tudo corretamente ótimo, você está pronto para os próximos passos!
 
-Sugiro que siga agora o guia de calibração [INSTRUCTIONS.md]() calibre a câmera de acordo com seu ambiente de captura e objetos de fundo.
+Sugiro que siga agora o guia de calibração [INSTRUCTIONS.md](calibra_webcam/INSTRUCTIONS.md) calibre a câmera de acordo com seu ambiente de captura e objetos de fundo.
 
 ### 📚 Guia de Instalação do ArduPilot e Gazebo
 
@@ -93,3 +103,4 @@ Desde já, agradeço à **Equipe UFVision** pela oportunidade de participar do p
 Projeto desenvolvido por **Kayo de M. Lage**
 
 Equipe UFVision — Universidade Federal de Viçosa (UFV)
+
